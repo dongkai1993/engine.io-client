@@ -172,7 +172,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.cert = opts.cert || null;
 	  this.ca = opts.ca || null;
 	  this.ciphers = opts.ciphers || null;
-	  this.rejectUnauthorized = opts.rejectUnauthorized === undefined ? null : opts.rejectUnauthorized;
+	  this.rejectUnauthorized = opts.rejectUnauthorized === undefined ? true : opts.rejectUnauthorized;
 	  this.forceNode = !!opts.forceNode;
 
 	  // other options for Node.js client
@@ -315,9 +315,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.readyState = 'opening';
 
 	  // Retry with the next transport if the transport is disabled (jsonp: false)
+	  var hasError = false;
 	  try {
 	    transport = this.createTransport(transport);
 	  } catch (e) {
+	    hasError = true;
+	  }
+	  if (hasError || typeof transport.check === 'function' && !transport.check()) {
 	    this.transports.shift();
 	    this.open();
 	    return;
